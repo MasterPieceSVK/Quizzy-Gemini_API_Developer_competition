@@ -14,11 +14,7 @@ const Material = db.define("Material", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  file_path: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  parsed_content: {
+  content: {
     type: DataTypes.TEXT,
     allowNull: true,
   },

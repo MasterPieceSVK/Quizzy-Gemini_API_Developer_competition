@@ -33,14 +33,19 @@ async function register(req, res) {
 }
 
 async function login(req, res) {
-  const { email, password } = req.body;
+  const { email, username, password } = req.body;
   try {
-    const user = await User.findOne({ where: { email } });
+    let user;
+    if (email) {
+      user = await User.findOne({ where: { email } });
+    } else if (username) {
+      user = await User.findOne({ where: { username } });
+    }
+
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
     const match = await bcrypt.compare(password, user.dataValues.password);
-    console.log(match);
     if (match) {
       const token = generateToken(user.id);
       res.cookie("token", token, {
@@ -51,7 +56,7 @@ async function login(req, res) {
       });
       res.send("Success");
     } else {
-      res.status(401).json({ error: "Invalid password" });
+      res.status(401).json({ error: "Invalid credentials" });
     }
   } catch (e) {
     console.log(e);

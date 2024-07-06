@@ -3,7 +3,12 @@ const validator = require("validator");
 const removeDots = require("../utils/removeDots");
 const registerValidationRules = () => {
   return [
-    body("username").isLength({ min: 5 }).withMessage("Username is required."),
+    body("username")
+      .isLength({ min: 5 })
+      .withMessage("Username is required.")
+      .matches(/^[a-zA-Z0-9]+$/)
+      .withMessage("Username can only contain letters and numbers."),
+
     body("email")
       .isEmail()
       .withMessage("Valid email is required.")
@@ -34,13 +39,14 @@ const validate = (req, res, next) => {
 const loginValidationRules = () => {
   return [
     body("email")
+      .optional()
       .isEmail()
       .withMessage("Valid email is required.")
       .customSanitizer((value) => validator.normalizeEmail(value))
       .customSanitizer((value) => removeDots(value)),
-    body("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters long."),
+    body("username").optional(),
+
+    body("password").isString(),
   ];
 };
 

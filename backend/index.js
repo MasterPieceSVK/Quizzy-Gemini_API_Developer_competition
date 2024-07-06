@@ -3,6 +3,7 @@ const serverless = require("serverless-http");
 const cors = require("cors");
 const authRouter = require("./src/routes/authRoutes");
 const db = require("./config/db");
+const materialRouter = require("./src/routes/materialRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -22,8 +23,14 @@ try {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:3001",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use("/auth", authRouter);
+app.use("/material", materialRouter);
 
 module.exports.handler = serverless(app);

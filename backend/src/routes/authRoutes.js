@@ -14,6 +14,6 @@ const { authMiddleware } = require("../middleware/authMiddleware");
 
 authRouter.post("/register", registerValidationRules(), validate, register);
 authRouter.post("/login", loginValidationRules(), validate, login);
-authRouter.get("/me", authMiddleware, getCurrentUser);
+authRouter.post("/me", authMiddleware, getCurrentUser);
 
 module.exports = authRouter;

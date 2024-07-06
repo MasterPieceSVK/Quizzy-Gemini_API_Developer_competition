@@ -13,7 +13,6 @@ try {
   console.log(e);
 }
 
-// Associations
 User.hasMany(Material, { foreignKey: "user_id" });
 Material.belongsTo(User, { foreignKey: "user_id" });
 
@@ -28,7 +27,7 @@ Exam.hasMany(Result, { foreignKey: "exam_id" });
 Result.belongsTo(User, { foreignKey: "user_id" });
 Result.belongsTo(Exam, { foreignKey: "exam_id" });
 if (process.env.NODE_ENV === "development") {
-  db.sync() // or { alter: true } for non-destructive updates
+  db.sync()
     .then(() => {
       console.log("Database & tables created!");
     })
