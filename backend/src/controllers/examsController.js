@@ -10,7 +10,7 @@ async function createExam(req, res) {
     return res.status(400).json({ error: "No file received." });
   }
   try {
-    const { questionNum } = req.body;
+    const { questionNum, aditional } = req.body;
     if (req.files.file[0].mimetype === "application/pdf") {
       const pdfData = await pdfParse(req.file.buffer);
       parsedText = pdfData.text;
@@ -34,7 +34,7 @@ async function createExam(req, res) {
       });
     }
 
-    const exam = await createExamWithAI(parsedText, questionNum);
+    const exam = await createExamWithAI(parsedText, questionNum, aditional);
     res.json(exam);
   } catch (error) {
     console.log(error);
@@ -44,14 +44,14 @@ async function createExam(req, res) {
 
 async function createExamWithText(req, res) {
   try {
-    const { about, questionNum } = req.body;
+    const { about, questionNum, aditional } = req.body;
     if (!about || !questionNum) {
       return res
         .status(400)
         .json({ error: "about or/and questionNum parameters is/are missing." });
     }
 
-    const exam = await createExamWithAIFromText(about, questionNum);
+    const exam = await createExamWithAIFromText(about, questionNum, aditional);
     res.json(exam);
   } catch (e) {
     console.log(e);

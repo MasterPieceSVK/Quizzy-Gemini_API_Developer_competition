@@ -1,4 +1,9 @@
-function getPrompt(input, questionNum) {
+function getPrompt(input, questionNum, aditional) {
+  if (aditional != undefined) {
+    aditional = "Here are some aditional requests: " + aditional;
+  } else {
+    aditional = ``;
+  }
   return `
     You are an AI designed to assist in creating educational materials. Today, your task is to generate a multiple-choice exam for students on behalf of a teacher. Please ensure that the questions are relevant to the subject matter, accurate, and clearly written. Follow these guidelines to create the exam:
     
@@ -28,10 +33,16 @@ function getPrompt(input, questionNum) {
     The number of questions i want you to create is: ${questionNum}
     Please strictly obey the number of questions i want from you.
     Make sure your output is in English.
+    ${aditional}
     Now please create an exam from this text:  ${input}`;
 }
 
-function getTextPrompt(input, questionNum) {
+function getTextPrompt(input, questionNum, aditional) {
+  if (aditional != undefined) {
+    aditional = "Here are some aditional requests: " + aditional;
+  } else {
+    aditional = ``;
+  }
   return `
     You are an AI designed to assist in creating educational materials. Today, your task is to generate a multiple-choice exam for students on behalf of a teacher. Please ensure that the questions are relevant to the subject matter, accurate, and clearly written. Follow these guidelines to create the exam:
     
@@ -61,6 +72,7 @@ function getTextPrompt(input, questionNum) {
     The number of questions i want you to create is: ${questionNum}
     Please strictly obey the number of questions i want from you.
     Make sure your output is in English.
+    ${aditional}
     Now please create an exam about this: ${input}`;
 }
 

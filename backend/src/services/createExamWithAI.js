@@ -5,11 +5,11 @@ require("dotenv").config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-async function createExamWithAI(parsedText, questionNum) {
+async function createExamWithAI(parsedText, questionNum, aditional) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = getPrompt(parsedText, questionNum);
+    const prompt = getPrompt(parsedText, questionNum, aditional);
 
     const result = await model.generateContent(prompt);
     const response = result.response;
@@ -22,12 +22,12 @@ async function createExamWithAI(parsedText, questionNum) {
   }
 }
 
-async function createExamWithAIFromText(about, questionNum) {
+async function createExamWithAIFromText(about, questionNum, aditional) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = getTextPrompt(about, questionNum);
-
+    const prompt = getTextPrompt(about, questionNum, aditional);
+    // console.log(prompt);
     const result = await model.generateContent(prompt);
     const response = result.response;
     const text = response.text();

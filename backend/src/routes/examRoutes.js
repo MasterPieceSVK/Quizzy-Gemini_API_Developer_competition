@@ -31,6 +31,7 @@ examRouter.post(
   upload.fields([
     { name: "file", maxCount: 1 },
     { name: "questionNum", maxCount: 1 },
+    { name: "aditional", maxCount: 1 },
   ]),
   examCreationValidationRules(),
   validateExam,

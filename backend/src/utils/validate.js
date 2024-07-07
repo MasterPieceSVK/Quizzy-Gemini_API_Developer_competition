@@ -66,6 +66,7 @@ const textExamCreationValidationRules = () => {
       .isInt({ min: 1, max: 20 })
       .withMessage("questionNum must be an integer between 1 and 20."),
     body("about").isString().withMessage("about must be a string"),
+    body("aditional").optional(),
   ];
 };
 
