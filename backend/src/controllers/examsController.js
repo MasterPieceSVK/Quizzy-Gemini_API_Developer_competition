@@ -12,7 +12,7 @@ async function createExam(req, res) {
   try {
     const { questionNum, aditional } = req.body;
     if (req.files.file[0].mimetype === "application/pdf") {
-      const pdfData = await pdfParse(req.file.buffer);
+      const pdfData = await pdfParse(req.files.file[0].buffer);
       parsedText = pdfData.text;
     } else if (
       req.files.file[0].mimetype ===

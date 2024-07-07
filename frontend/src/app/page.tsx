@@ -12,6 +12,7 @@ export default function Page() {
   const [clickable, setClickable] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
   const [role, setRole] = useState<string | null>(null);
+  const [requestError, setRequestError] = useState("");
 
   const { mutate: authMutate } = useMutation<Response, Error>({
     mutationFn: async () => {
@@ -29,10 +30,15 @@ export default function Page() {
       setIsAuth(true);
       setClickable(true);
     },
-    onError: (e) => {
+    onError: (e: Error) => {
+      if (e.code === "ERR_NETWORK") {
+        setRequestError(
+          "Network error. The server may be down. Please come back later."
+        );
+      }
+
       const hasAccount = localStorage.getItem("hasAccount");
       if (hasAccount) setHasAccount(true);
-
       setClickable(true);
     },
   });
@@ -55,22 +61,28 @@ export default function Page() {
             Upload your teaching materials and let Quizzy generate comprehensive
             multiple-choice exams in minutes.
           </p>
-          <Link
-            href={`${
-              isAuth && role
-                ? `/${role}-dashboard`
-                : hasAccount
-                ? "/sign-in"
-                : "/register"
-            }`}
-          >
-            <button
-              disabled={!clickable}
-              className="btn btn-primary disabled:text-white"
+          {clickable ? (
+            <Link
+              href={`${
+                isAuth && role
+                  ? `/${role}-dashboard`
+                  : hasAccount
+                  ? "/sign-in"
+                  : "/register"
+              }`}
             >
-              Get Started with Quizzy
+              <button className="btn btn-primary">
+                Get Started with Quizzy
+              </button>
+            </Link>
+          ) : (
+            <button disabled className="btn btn-primary disabled:text-white">
+              Loading...
             </button>
-          </Link>
+          )}
+          {requestError && (
+            <h4 className="mt-4 text-red-500">{requestError}</h4>
+          )}
         </div>
       </div>
     </div>
