@@ -7,9 +7,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Home() {
-  const router = useRouter();
+export default function Page() {
   const [isAuth, setIsAuth] = useState(false);
+  const [clickable, setClickable] = useState(false);
+  const [hasAccount, setHasAccount] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
 
   const { mutate: authMutate } = useMutation<Response, Error>({
     mutationFn: async () => {
@@ -21,11 +23,17 @@ export default function Home() {
         }
       );
     },
-    onSuccess: () => {
+    onSuccess: (res: Response) => {
+      console.log(res);
+      setRole(res.data.role);
       setIsAuth(true);
+      setClickable(true);
     },
     onError: (e) => {
-      console.log(e);
+      const hasAccount = localStorage.getItem("hasAccount");
+      if (hasAccount) setHasAccount(true);
+
+      setClickable(true);
     },
   });
 
@@ -47,8 +55,21 @@ export default function Home() {
             Upload your teaching materials and let Quizzy generate comprehensive
             multiple-choice exams in minutes.
           </p>
-          <Link href={`${isAuth ? "/dashboard" : "/register"}`}>
-            <button className="btn btn-primary">Get Started with Quizzy</button>
+          <Link
+            href={`${
+              isAuth && role
+                ? `/${role}-dashboard`
+                : hasAccount
+                ? "/sign-in"
+                : "/register"
+            }`}
+          >
+            <button
+              disabled={!clickable}
+              className="btn btn-primary disabled:text-white"
+            >
+              Get Started with Quizzy
+            </button>
           </Link>
         </div>
       </div>

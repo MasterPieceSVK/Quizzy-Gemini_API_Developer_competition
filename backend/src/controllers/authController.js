@@ -21,7 +21,7 @@ async function register(req, res) {
       maxAge: 30 * 24 * 60 * 60 * 1000, //  30 days
     });
 
-    res.send("Success");
+    res.json({ role: user.role });
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
       let field = error.errors[0].path;
@@ -54,7 +54,7 @@ async function login(req, res) {
         sameSite: "strict",
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       });
-      res.send("Success");
+      res.json({ role: user.role });
     } else {
       res.status(401).json({ error: "Invalid credentials" });
     }

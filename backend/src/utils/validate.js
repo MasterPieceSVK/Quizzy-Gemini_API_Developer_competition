@@ -50,4 +50,44 @@ const loginValidationRules = () => {
   ];
 };
 
-module.exports = { registerValidationRules, validate, loginValidationRules };
+const examCreationValidationRules = () => {
+  return [
+    body("questionNum")
+      .customSanitizer((value) => parseInt(value, 10))
+      .isInt({ min: 1, max: 20 })
+      .withMessage("questionNum must be an integer between 1 and 20."),
+  ];
+};
+
+const textExamCreationValidationRules = () => {
+  return [
+    body("questionNum")
+      .customSanitizer((value) => parseInt(value, 10))
+      .isInt({ min: 1, max: 20 })
+      .withMessage("questionNum must be an integer between 1 and 20."),
+    body("about").isString().withMessage("about must be a string"),
+  ];
+};
+
+const validateExam = (req, res, next) => {
+  const errors = validationResult(req);
+  if (errors.isEmpty()) {
+    return next();
+  }
+  const firstError = errors.array()[0].msg;
+
+  return res.status(422).json({
+    error: firstError,
+  });
+};
+
+module.exports = validate;
+
+module.exports = {
+  registerValidationRules,
+  validate,
+  loginValidationRules,
+  examCreationValidationRules,
+  validateExam,
+  textExamCreationValidationRules,
+};

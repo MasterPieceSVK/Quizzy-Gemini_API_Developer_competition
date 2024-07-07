@@ -10,7 +10,6 @@ const uploadMaterial = async (req, res) => {
 
   const title = req.file.originalname;
   let parsedText = "";
-  let fallbackParsedText = "";
 
   try {
     if (req.file.mimetype === "application/pdf") {

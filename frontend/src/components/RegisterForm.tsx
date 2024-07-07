@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export type Response = {
-  message: string;
+  data: { role: string };
 };
 
 export type Error = {
@@ -67,9 +67,11 @@ export default function RegisterForm() {
           { withCredentials: true }
         );
       },
-      onSuccess: () => {
+      onSuccess: (res: Response) => {
         setFormError(null);
-        router.push("/dashboard");
+        localStorage.setItem("hasAccount", "true");
+
+        router.push(`/${res.data.role}-dashboard`);
       },
       onError: (e) => {
         console.log(e);

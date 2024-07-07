@@ -4,6 +4,7 @@ const cors = require("cors");
 const authRouter = require("./src/routes/authRoutes");
 const db = require("./config/db");
 const materialRouter = require("./src/routes/materialRoutes");
+const examRouter = require("./src/routes/examRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:3001",
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true,
 };
 
@@ -32,5 +33,6 @@ app.use(cors(corsOptions));
 
 app.use("/auth", authRouter);
 app.use("/material", materialRouter);
+app.use("/exams", examRouter);
 
 module.exports.handler = serverless(app);

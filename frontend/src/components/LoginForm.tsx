@@ -18,9 +18,10 @@ export default function LoginForm() {
         withCredentials: true,
       });
     },
-    onSuccess: () => {
+    onSuccess: (res: Response) => {
       setFormError(null);
-      router.push("/dashboard");
+      localStorage.setItem("hasAccount", "true");
+      router.push(`/${res.data.role}-dashboard`);
     },
     onError: (e) => {
       console.log(e);
