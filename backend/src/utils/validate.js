@@ -70,6 +70,10 @@ const textExamCreationValidationRules = () => {
   ];
 };
 
+const finalizeExamValidationRules = () => {
+  return [body("data").isString().withMessage("data must be present")];
+};
+
 const validateExam = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
@@ -91,4 +95,5 @@ module.exports = {
   examCreationValidationRules,
   validateExam,
   textExamCreationValidationRules,
+  finalizeExamValidationRules,
 };

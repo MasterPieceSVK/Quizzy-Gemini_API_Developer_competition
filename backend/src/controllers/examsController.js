@@ -5,6 +5,10 @@ const {
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { getTextPrompt } = require("../utils/aiPrompt");
+const { Question } = require("../models/question");
+const { Exam } = require("../models/exam");
+const { Sequelize } = require("sequelize");
+const db = require("../../config/db");
 async function createExam(req, res) {
   if (!req.files.file) {
     return res.status(400).json({ error: "No file received." });
@@ -58,4 +62,88 @@ async function createExamWithText(req, res) {
     return res.status(500).json({ error: "Error while creating exam" });
   }
 }
-module.exports = { createExam, createExamWithText };
+
+async function finalizeExam(req, res) {
+  const transaction = await db.transaction();
+
+  try {
+    let { data } = req.body;
+    data = JSON.parse(data);
+
+    const { name, exam } = data;
+    const user_id = req.user.id;
+
+    const newExam = await Exam.create(
+      {
+        user_id,
+        title: name,
+      },
+      { transaction }
+    );
+
+    const questionPromises = exam.map((question) => {
+      return Question.create(
+        {
+          exam_id: newExam.id,
+          question: question.question,
+          options: question.options,
+          correct_option: question.correct,
+        },
+        { transaction }
+      );
+    });
+
+    await Promise.all(questionPromises);
+
+    // Commit the transaction
+    await transaction.commit();
+
+    res.status(201).json({
+      exam: newExam,
+      questions: exam,
+    });
+  } catch (e) {
+    await transaction.rollback();
+    console.error(e);
+    res.status(500).json({ error: "Error while finalizing exam" });
+  }
+}
+
+async function getExams(req, res) {
+  try {
+    const user_id = req.user.id;
+
+    const exams = await Exam.findAll({
+      where: { user_id },
+    });
+
+    if (!exams || exams.length === 0) {
+      return res.status(404).json({ error: "No exams found for this user" });
+    }
+
+    const examsWithQuestionsCount = [];
+
+    for (const exam of exams) {
+      const questionCount = await Question.count({
+        where: { exam_id: exam.id },
+      });
+
+      const examData = {
+        id: exam.id,
+        title: exam.title,
+        questionCount: questionCount,
+      };
+
+      examsWithQuestionsCount.push(examData);
+    }
+
+    res.status(200).json(examsWithQuestionsCount);
+  } catch (e) {
+    console.log(e);
+    res
+      .status(500)
+      .json({ error: "Error while getting exams and question counts" });
+  }
+}
+
+module.exports = { createExam, createExamWithText, finalizeExam, getExams };

@@ -226,7 +226,7 @@ export default function Page() {
           disabled={isDisabled() || createExamMutation.isPending}
         >
           {createExamMutation.isPending ? (
-            <p className="text-white">Creating...</p>
+            <p className="text-primary">Creating...</p>
           ) : (
             <p>Create</p>
           )}
