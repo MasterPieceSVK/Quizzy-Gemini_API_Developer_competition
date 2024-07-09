@@ -146,4 +146,33 @@ async function getExams(req, res) {
   }
 }
 
-module.exports = { createExam, createExamWithText, finalizeExam, getExams };
+async function getExam(req, res) {
+  try {
+    const user_id = req.user.id;
+
+    const exam = await Exam.findByPk(req.params.id, {
+      where: { user_id },
+    });
+
+    const questions = await Question.findAll({ where: { exam_id: exam.id } });
+
+    if (exam.user_id != user_id) {
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to view this exam" });
+    }
+
+    res.json({ exam, questions });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ error: "Error while getting exam" });
+  }
+}
+
+module.exports = {
+  createExam,
+  createExamWithText,
+  finalizeExam,
+  getExams,
+  getExam,
+};

@@ -10,9 +10,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export type Question = {
-  correct: string;
+  correct?: string;
+  correct_option?: string;
+
   question: string;
   options: string[];
+  id?: number;
 };
 
 type ExamObject = {

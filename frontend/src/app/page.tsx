@@ -51,8 +51,8 @@ export default function Page() {
     <div className="hero bg-base-200 min-h-screen">
       <div className="hero-content text-center">
         <div className="max-w-md">
-          <h1 className="mb-4 text-7xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-blue-600 via-primary to-blue-600">
-            Quizzy:
+          <h1 className="mb-4 text-7xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-blue-600 via-primary to-blue-600 p-2">
+            Quizzy
           </h1>
           <h1 className="text-4xl font-bold">
             The Ultimate Tool for Modern Educators

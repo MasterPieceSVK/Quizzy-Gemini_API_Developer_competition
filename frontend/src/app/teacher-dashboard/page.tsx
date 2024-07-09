@@ -1,6 +1,7 @@
 "use client";
 
 import ExamCard from "@/components/ExamCard";
+import { SheetIcon } from "@/components/icons/SheetIcon";
 import { Error, Response } from "@/components/RegisterForm";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -22,6 +23,7 @@ export default function Page() {
   const [createdExam, setCreatedExam] = useState(false);
   const [exams, setExams] = useState<Exam[]>([]);
   const [requestError, setRequestError] = useState("");
+  const [noExams, setNoExams] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,9 +68,11 @@ export default function Page() {
         .then((res: ExamsResponse) => {
           setExams(res.data);
         })
-        .catch((e) => {
+        .catch((e: Error) => {
           console.log(e);
-          if (e.response?.data) {
+          if (e.response?.data?.error === "No exams found for this user") {
+            setNoExams(true);
+          } else if (e.response?.data) {
             setRequestError(e.response.data.error);
           } else if (e.code === "ERR_NETWORK") {
             setRequestError("Network error. The server may be down.");
@@ -99,9 +103,17 @@ export default function Page() {
       </div>
       {isPending && <h4 className="text-white mt-5">Fetching Exams...</h4>}
       {requestError && (
-        <h4 className="text-red-500 text-center text-wrap">{requestError}</h4>
+        <h4 className=" mt-6 text-red-500 text-center text-wrap">
+          {requestError}
+        </h4>
       )}
-      <div className="w-full flex flex-col mt-5">
+      {noExams && (
+        <div className="flex flex-col gap-8 items-center justify-center h-full">
+          <h4 className="mt-6 text-2xl">You don&apos;t have any exams</h4>
+          <SheetIcon size={200} />
+        </div>
+      )}
+      <div className="w-full md:w-1/2 flex flex-col mt-16">
         {exams &&
           exams.map((exam, i) => {
             return <ExamCard {...exam} key={i} />;

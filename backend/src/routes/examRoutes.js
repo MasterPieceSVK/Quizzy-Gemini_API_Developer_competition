@@ -23,6 +23,7 @@ const {
   createExamWithText,
   finalizeExam,
   getExams,
+  getExam,
 } = require("../controllers/examsController");
 const { createExamInDb } = require("../services/createExamInDb");
 const upload = multer();
@@ -61,5 +62,7 @@ examRouter.post(
 );
 
 examRouter.get("/", authMiddleware, teacherMiddleware, getExams);
+
+examRouter.get("/:id", authMiddleware, teacherMiddleware, getExam);
 
 module.exports = examRouter;
