@@ -115,10 +115,11 @@ async function getExams(req, res) {
 
     const exams = await Exam.findAll({
       where: { user_id },
+      order: [["updatedAt", "DESC"]],
     });
 
     if (!exams || exams.length === 0) {
-      return res.status(404).json({ error: "No exams found for this user" });
+      return res.status(404).json({ error: "No quizzes found for this user" });
     }
 
     const examsWithQuestionsCount = [];
@@ -169,10 +170,83 @@ async function getExam(req, res) {
   }
 }
 
+async function updateExam(req, res) {
+  const transaction = await db.transaction();
+
+  try {
+    const user_id = req.user.id;
+    const exam_id = req.params.id;
+    const data = JSON.parse(req.body.data);
+
+    const exam = await Exam.findByPk(exam_id, {
+      where: { user_id },
+      transaction,
+    });
+    if (!exam) {
+      await transaction.rollback();
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to update this exam" });
+    }
+
+    if (exam.title !== data.name) {
+      await exam.update({ title: data.name }, { transaction });
+    }
+
+    const questions = data.exam;
+    const existingQuestions = await Question.findAll({
+      where: { exam_id },
+      transaction,
+    });
+
+    const existingQuestionIds = existingQuestions.map((q) => q.id);
+    const updatedQuestionIds = questions.map((q) => q.id);
+
+    const questionsToDelete = existingQuestionIds.filter(
+      (id) => !updatedQuestionIds.includes(id)
+    );
+    await Question.destroy(
+      { where: { id: questionsToDelete } },
+      { transaction }
+    );
+
+    const questionPromises = questions.map(async (question) => {
+      if (question.id) {
+        const existingQuestion = await Question.findByPk(question.id, {
+          transaction,
+        });
+        if (existingQuestion) {
+          await existingQuestion.update(question, { transaction });
+        }
+      } else {
+        await Question.create(
+          {
+            exam_id: exam_id,
+            question: question.question,
+            options: question.options,
+            correct_option: question.correct_option,
+          },
+          { transaction }
+        );
+      }
+    });
+
+    await Promise.all(questionPromises);
+
+    await transaction.commit();
+    res.status(200).json({ message: "Exam updated successfully" });
+  } catch (e) {
+    await transaction.rollback();
+    console.log(e);
+    res.status(500).json({ error: "Error while updating exam" });
+  }
+}
+
 module.exports = {
   createExam,
   createExamWithText,
   finalizeExam,
   getExams,
   getExam,
+  updateExam,
 };

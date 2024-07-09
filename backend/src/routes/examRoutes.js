@@ -3,11 +3,6 @@ const examRouter = express.Router();
 const multer = require("multer");
 
 const {
-  register,
-  login,
-  getCurrentUser,
-} = require("../controllers/authController");
-const {
   registerValidationRules,
   validate,
   loginValidationRules,
@@ -24,6 +19,7 @@ const {
   finalizeExam,
   getExams,
   getExam,
+  updateExam,
 } = require("../controllers/examsController");
 const { createExamInDb } = require("../services/createExamInDb");
 const upload = multer();
@@ -64,5 +60,7 @@ examRouter.post(
 examRouter.get("/", authMiddleware, teacherMiddleware, getExams);
 
 examRouter.get("/:id", authMiddleware, teacherMiddleware, getExam);
+
+examRouter.put("/:id", authMiddleware, teacherMiddleware, updateExam);
 
 module.exports = examRouter;

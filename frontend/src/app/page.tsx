@@ -59,7 +59,7 @@ export default function Page() {
           </h1>
           <p className="py-6">
             Upload your teaching materials and let Quizzy generate comprehensive
-            multiple-choice exams in minutes.
+            multiple-choice quizzes in minutes.
           </p>
           {clickable ? (
             <Link

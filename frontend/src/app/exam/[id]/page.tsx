@@ -4,6 +4,7 @@ import QuestionCard from "@/components/QuestionCard";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type ExamResponse = {
@@ -17,6 +18,8 @@ type ExamResponse = {
 export default function Page({ params }: { params: { id: string } }) {
   const [requestError, setRequestError] = useState("");
   const [exam, setExam] = useState<ExamResponse>();
+
+  const router = useRouter();
 
   const { isPending } = useQuery({
     queryKey: ["exam"],
@@ -46,13 +49,22 @@ export default function Page({ params }: { params: { id: string } }) {
     },
   });
 
+  function handleExamEdit() {
+    router.push(`/exam/edit/${params.id}?exam=${JSON.stringify(exam)}`);
+  }
+  function handleAssign() {
+    console.log("assign");
+  }
+
   return (
     <div className="bg-base-100">
       <nav className="flex justify-between">
         <Link href={"/teacher-dashboard"}>
           <button className="btn btn-ghost mt-2 ml-2">Quizzy</button>
         </Link>
-        <button className="btn btn-ghost mt-2 mr-2">Edit</button>
+        <button onClick={handleExamEdit} className="btn btn-ghost mt-2 mr-2">
+          Edit
+        </button>
       </nav>
       <main>
         {isPending && <p>Loading...</p>}
@@ -62,8 +74,14 @@ export default function Page({ params }: { params: { id: string } }) {
           </p>
         )}
         {exam && (
-          <div className=" gap-4 flex flex-col">
+          <div className=" gap-4 flex flex-col items-center">
             <h1 className="text-xl text-center">{exam.exam.title}</h1>
+            <button
+              className="btn btn-primary w-full lg:w-5/6"
+              onClick={handleAssign}
+            >
+              Assign Quiz
+            </button>
             <div className="flex flex-col gap-3 items-center w-full">
               {exam.questions.map((question, i) => (
                 <QuestionCard {...question} key={i} />

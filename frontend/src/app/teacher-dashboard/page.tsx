@@ -21,6 +21,8 @@ export interface Exam {
 
 export default function Page() {
   const [createdExam, setCreatedExam] = useState(false);
+  const [editedExam, setEditedExam] = useState(false);
+
   const [exams, setExams] = useState<Exam[]>([]);
   const [requestError, setRequestError] = useState("");
   const [noExams, setNoExams] = useState(false);
@@ -30,10 +32,17 @@ export default function Page() {
 
   useEffect(() => {
     const success = searchParams.get("success");
+    const editted = searchParams.get("edit");
     if (success) {
       setCreatedExam(true);
       setTimeout(() => {
         setCreatedExam(false);
+      }, 5000);
+    }
+    if (editted) {
+      setEditedExam(true);
+      setTimeout(() => {
+        setEditedExam(false);
       }, 5000);
     }
   }, []);
@@ -70,7 +79,7 @@ export default function Page() {
         })
         .catch((e: Error) => {
           console.log(e);
-          if (e.response?.data?.error === "No exams found for this user") {
+          if (e.response?.data?.error === "No quizzes found for this user") {
             setNoExams(true);
           } else if (e.response?.data) {
             setRequestError(e.response.data.error);
@@ -91,17 +100,29 @@ export default function Page() {
       {createdExam && (
         <div className="bg-primary w-full p-3">
           <h4 className="text-black text-center text-wrap font-bold">
-            You successfully created a new exam
+            You successfully created a new quiz
+          </h4>
+        </div>
+      )}
+      {editedExam && (
+        <div className="bg-primary w-full p-3">
+          <h4 className="text-black text-center text-wrap font-bold">
+            You successfully edited a quiz
           </h4>
         </div>
       )}
       <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-0 md:justify-around w-full items-center mt-5">
-        <h3 className="text-3xl">Your Exams</h3>
-        <Link href={"/exams/create"}>
-          <button className="btn btn-primary">Create New Exam</button>
-        </Link>
+        <h3 className="text-3xl">Your Quizzes</h3>
+        <div className="flex gap-4">
+          <Link href={"/teacher-groups"}>
+            <button className="btn btn-primary">My groups</button>
+          </Link>
+          <Link href={"/exams/create"}>
+            <button className="btn btn-primary">Create New Quiz</button>
+          </Link>
+        </div>
       </div>
-      {isPending && <h4 className="text-white mt-5">Fetching Exams...</h4>}
+      {isPending && <h4 className="text-white mt-5">Fetching Quizzes...</h4>}
       {requestError && (
         <h4 className=" mt-6 text-red-500 text-center text-wrap">
           {requestError}
@@ -109,7 +130,7 @@ export default function Page() {
       )}
       {noExams && (
         <div className="flex flex-col gap-8 items-center justify-center h-full">
-          <h4 className="mt-6 text-2xl">You don&apos;t have any exams</h4>
+          <h4 className="mt-6 text-2xl">You don&apos;t have any quizzes</h4>
           <SheetIcon size={200} />
         </div>
       )}

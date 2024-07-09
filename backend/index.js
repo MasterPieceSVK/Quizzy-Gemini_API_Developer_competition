@@ -5,6 +5,7 @@ const authRouter = require("./src/routes/authRoutes");
 const db = require("./config/db");
 const materialRouter = require("./src/routes/materialRoutes");
 const examRouter = require("./src/routes/examRoutes");
+const groupsRouter = require("./src/routes/groupRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -34,5 +35,6 @@ app.use(cors(corsOptions));
 app.use("/auth", authRouter);
 app.use("/material", materialRouter);
 app.use("/exams", examRouter);
+app.use("/groups", groupsRouter);
 
 module.exports.handler = serverless(app);

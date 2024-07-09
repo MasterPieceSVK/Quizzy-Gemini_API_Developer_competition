@@ -1,6 +1,7 @@
 "use client";
 
 import CreateQuestionCard from "@/components/CreateQuestionCard";
+import EditQuestionCard from "@/components/EditQuestionCard";
 import { PlusIcon } from "@/components/icons/PlusIcon";
 import { Error, Response } from "@/components/RegisterForm";
 import { useMutation } from "@tanstack/react-query";
@@ -9,29 +10,44 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export type Question = {
-  correct?: string;
-  correct_option?: string;
-
+type Question = {
+  id?: number;
+  exam_id?: number;
   question: string;
   options: string[];
-  id?: number;
+  correct_option?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
-type ExamObject = {
+type Exam = {
+  id: number;
+  user_id: number;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type ExamData = {
+  exam: Exam;
+  questions: Question[];
+};
+
+export type ExamObject = {
   name: string;
   exam: Question[];
 };
 
-type Input = {
+export type Input = {
   data: string;
 };
 
-export default function Page() {
-  const [exam, setExam] = useState<Question[]>([]);
+export default function Page({ params }: { params: { id: string } }) {
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [name, setName] = useState("");
   const [undefinedError, setUndefinedError] = useState(false);
   const [requestError, setRequestError] = useState("");
+  const id = params.id;
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -60,15 +76,10 @@ export default function Page() {
     authMutate();
 
     const paramExam = searchParams.get("exam");
-    const paramName = searchParams.get("name");
-    if (
-      paramExam &&
-      paramName &&
-      paramExam != "undefined" &&
-      paramName != "undefined"
-    ) {
-      setExam(JSON.parse(paramExam));
-      setName(paramName);
+    if (paramExam && paramExam != "undefined") {
+      const parsedExam: ExamData = JSON.parse(paramExam);
+      setName(parsedExam.exam.title);
+      setQuestions(parsedExam.questions);
     } else {
       setUndefinedError(true);
     }
@@ -79,10 +90,10 @@ export default function Page() {
     field: string,
     value: string
   ) => {
-    const updatedExam = exam.map((q, i) =>
+    const updatedQuestions = questions.map((q, i) =>
       i === index ? { ...q, [field]: value } : q
     );
-    setExam(updatedExam);
+    setQuestions(updatedQuestions);
   };
 
   const handleOptionChange = (
@@ -90,7 +101,7 @@ export default function Page() {
     optionIndex: number,
     value: string
   ) => {
-    const updatedExam = exam.map((q, i) =>
+    const updatedQuestions = questions.map((q, i) =>
       i === questionIndex
         ? {
             ...q,
@@ -100,14 +111,14 @@ export default function Page() {
           }
         : q
     );
-    setExam(updatedExam);
+    setQuestions(updatedQuestions);
   };
 
   const handleCorrectChange = (index: number, value: string) => {
-    const updatedExam = exam.map((q, i) =>
-      i === index ? { ...q, correct: value } : q
+    const updatedQuestions = questions.map((q, i) =>
+      i === index ? { ...q, correct_option: value } : q
     );
-    setExam(updatedExam);
+    setQuestions(updatedQuestions);
   };
 
   function handleExamNameChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -115,29 +126,28 @@ export default function Page() {
   }
 
   function addQuestion() {
-    const newQuestion = {
+    const newQuestion: Question = {
       question: "New Question",
       options: ["Answer 1", "Answer 2", "Answer 3", "Answer 4"],
-      correct: "Answer 1",
+      correct_option: "Answer 1",
     };
-    setExam([...exam, newQuestion]);
+    setQuestions([...questions, newQuestion]);
   }
 
   function onQuestionDelete(index: number) {
-    const updatedExam = exam.filter((_, i) => i !== index);
-    setExam(updatedExam);
+    const updatedQuestions = questions.filter((_, i) => i !== index);
+    setQuestions(updatedQuestions);
   }
 
-  const finalizeMutation = useMutation<Response, Error, Input>({
+  const updateMutation = useMutation<Response, Error, Input>({
     mutationFn: async (data) => {
-      return axios.post(
-        `${process.env.NEXT_PUBLIC_BASEURL}/exams/finalize`,
-        data,
-        { withCredentials: true }
-      );
+      return axios.put(`${process.env.NEXT_PUBLIC_BASEURL}/exams/${id}`, data, {
+        withCredentials: true,
+      });
     },
-    onSuccess: () => {
-      router.push("/teacher-dashboard?success=true");
+    onSuccess: (res) => {
+      console.log(res);
+      router.push("/teacher-dashboard?edit=true");
     },
     onError: (e: Error) => {
       console.log(e);
@@ -154,17 +164,18 @@ export default function Page() {
   function onCreateExam() {
     const examObject: ExamObject = {
       name,
-      exam,
+      exam: questions,
     };
     const input = { data: JSON.stringify(examObject) };
-    finalizeMutation.mutate(input);
+    console.log(examObject);
+    updateMutation.mutate(input);
   }
 
   return (
     <div className=" h-lvh">
       <div className="h-[5%] bg-base-100">
-        <Link href={"/teacher-dashboard"}>
-          <button className="btn btn-ghost mt-2 ml-2">Quizzy</button>
+        <Link href={`/exam/${id}`}>
+          <button className="btn btn-ghost mt-2 ml-2">Back</button>
         </Link>
       </div>
       {!undefinedError ? (
@@ -177,17 +188,16 @@ export default function Page() {
             onChange={handleExamNameChange}
           />
 
-          {exam &&
-            exam.map((question, index) => {
+          {questions &&
+            questions.map((question, index) => {
               const theOption = question.options.find(
-                (option) => option === question.correct
+                (option) => option === question.correct_option
               );
-              console.log(theOption);
               if (!theOption) {
-                question.correct = question.options[0];
+                question.correct_option = question.options[0];
               }
               return (
-                <CreateQuestionCard
+                <EditQuestionCard
                   key={index}
                   question={question}
                   index={index}
@@ -201,9 +211,9 @@ export default function Page() {
           <button
             className="btn w-5/6 xl:w-1/2 btn-primary disabled:border-red-500 disabled:border-2"
             onClick={addQuestion}
-            disabled={exam.length >= 20}
+            disabled={questions.length >= 20}
           >
-            {exam.length < 20 ? (
+            {questions.length < 20 ? (
               <PlusIcon size={15} />
             ) : (
               <h5 className="text-white">Max. number of questions reached</h5>
@@ -215,9 +225,9 @@ export default function Page() {
               !requestError && "mb-7"
             } disabled:border-primary disabled:text-primary`}
             onClick={onCreateExam}
-            disabled={finalizeMutation.isPending}
+            disabled={updateMutation.isPending}
           >
-            {finalizeMutation.isPending ? "Creating..." : "Create"}
+            {updateMutation.isPending ? "Editing..." : "Edit"}
           </button>
           {requestError && (
             <h6 className="text-red-500 text-center text-wrap w-5/6 mb-7">
@@ -228,7 +238,7 @@ export default function Page() {
       ) : (
         <div className="flex flex-col items-center justify-center gap-5 bg-base-100 h-full">
           <h4 className="text-center text-wrap px-3">
-            An error occured when creating your quiz. Maybe the document
+            An error occurred when creating your exam. Maybe the document
             wasn&apos;t read correctly. Please try again.
           </h4>
           <Link href={"/exams/create"}>

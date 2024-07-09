@@ -154,7 +154,7 @@ export default function Page() {
             <h2 className="text-center text-wrap px-4">
               Upload a <span className="text-primary">.docx</span> or{" "}
               <span className="text-primary">.pdf</span> file of your notes and{" "}
-              <span className="text-primary">AI</span> will generate your exam.
+              <span className="text-primary">AI</span> will generate your quiz.
             </h2>
 
             <input
@@ -167,7 +167,7 @@ export default function Page() {
           <div className="divider">OR</div>
           <div className="card bg-base-300 rounded-box grid h-1/2 place-items-center gap-3 py-4">
             <h2>
-              Tell us what the <span className="text-primary">exam</span> should
+              Tell us what the <span className="text-primary">quiz</span> should
               be about.
             </h2>
             <input
