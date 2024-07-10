@@ -1,13 +1,30 @@
 "use client";
-import { Response } from "@/components/RegisterForm";
-import { useMutation } from "@tanstack/react-query";
+import GroupCard from "@/components/GroupCard";
+import { Error, Response } from "@/components/RegisterForm";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+type Group = {
+  id: number;
+  name: string;
+  invite_code: string;
+  teacher_id: number;
+  studentCount: number;
+};
+
+type GroupResponse = {
+  data: Group[];
+};
+
 export default function Page() {
   const [groupName, setGroupName] = useState("");
+  const [requestError, setRequestError] = useState("");
+  const [noGroups, setNoGroups] = useState(false);
+  const [groups, setGroups] = useState<Group[]>([]);
+
   const router = useRouter();
 
   const { mutate: authMutate } = useMutation<Response, Error>({
@@ -34,7 +51,7 @@ export default function Page() {
     authMutate();
   }, []);
 
-  const createGroupMutation = useMutation<Response, Error, string>({
+  const createGroupMutation = useMutation<GroupResponse, Error, string>({
     mutationFn: async (name) => {
       return axios.post(
         `${process.env.NEXT_PUBLIC_BASEURL}/groups/create`,
@@ -44,17 +61,57 @@ export default function Page() {
         }
       );
     },
-    onSuccess: (res) => {
+    onSuccess: (res: GroupResponse) => {
       console.log(res);
     },
-    onError: () => {
-      router.push("/");
+    onError: (e: Error) => {
+      console.log(e);
+      if (e.response?.data) {
+        setRequestError(e.response.data.error);
+      } else if (e.code === "ERR_NETWORK") {
+        setRequestError("Network error. The server may be down.");
+      } else if (e.message) {
+        setRequestError(e.message);
+      }
     },
   });
 
   function handleCreateGroup() {
-    createGroupMutation.mutate(groupName);
+    if (groupName) {
+      const modal = document.getElementById(
+        "my_modal_2"
+      ) as HTMLDialogElement | null;
+      if (modal) {
+        modal.close();
+      }
+      createGroupMutation.mutate(groupName);
+    }
   }
+
+  const { isPending } = useQuery({
+    queryKey: ["groups"],
+    queryFn: () =>
+      axios
+        .get(`${process.env.NEXT_PUBLIC_BASEURL}/groups`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          setGroups(res.data);
+        })
+        .catch((e: Error) => {
+          console.log(e);
+          if (e.response?.data?.error === "No quizzes found for this user") {
+            setNoGroups(true);
+          } else if (e.response?.data) {
+            setRequestError(e.response.data.error);
+          } else if (e.code === "ERR_NETWORK") {
+            setRequestError("Network error. The server may be down.");
+          } else if (e.message) {
+            setRequestError(e.message);
+          }
+        }),
+  });
+
   return (
     <div className="bg-base-100">
       <nav>
@@ -64,21 +121,19 @@ export default function Page() {
       </nav>
       <main className="flex flex-col items-center w-full gap-5">
         <h1>Your groups</h1>
+        {requestError && (
+          <p className="text-red-500 text-center text-wrap text-lg">
+            {requestError}
+          </p>
+        )}
         <div className="flex flex-col items-center w-full gap-3">
-          <Link
-            href={"/groups/id"}
-            className="bg-base-300 flex justify-between w-full md:w-5/6 p-4"
-          >
-            <h5>Name of group</h5>
-            <h5>Number of students</h5>
-          </Link>
-          <Link
-            href={"/groups/id"}
-            className="bg-base-300 flex justify-between w-full md:w-5/6 p-4"
-          >
-            <h5>Name of group</h5>
-            <h5>Number of students</h5>
-          </Link>
+          {groups.length === 0 && noGroups && (
+            <p>You don&apos;t have any groups</p>
+          )}
+          {groups &&
+            groups.map((group, i) => {
+              return <GroupCard key={i} {...group} />;
+            })}
         </div>
         <button
           className="btn btn-primary mb-5"
@@ -105,8 +160,9 @@ export default function Page() {
                 onChange={(e) => setGroupName(e.target.value)}
               />
               <button
-                className="btn btn-primary ml-3"
+                className="btn btn-primary ml-3 disabled:border-primary disabled:text-primary"
                 onClick={handleCreateGroup}
+                disabled={!groupName}
               >
                 Create
               </button>

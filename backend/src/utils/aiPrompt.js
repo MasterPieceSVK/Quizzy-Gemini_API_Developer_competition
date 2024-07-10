@@ -32,7 +32,7 @@ function getPrompt(input, questionNum, aditional) {
     }
     The number of questions i want you to create is: ${questionNum}
     Please strictly obey the number of questions i want from you.
-    Make sure your output is in English.
+    Make sure your output is in the language of the input.
     ${aditional}
     Now please create an exam from this text:  ${input}`;
 }
@@ -71,7 +71,7 @@ function getTextPrompt(input, questionNum, aditional) {
     }
     The number of questions i want you to create is: ${questionNum}
     Please strictly obey the number of questions i want from you.
-    Make sure your output is in English.
+    Make sure your output is in the language of the input.
     ${aditional}
     Now please create an exam about this: ${input}`;
 }

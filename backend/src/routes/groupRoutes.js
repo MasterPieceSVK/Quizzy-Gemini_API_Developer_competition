@@ -9,8 +9,10 @@ const {
 } = require("../utils/validate");
 const { authMiddleware } = require("../middleware/authMiddleware");
 const { teacherMiddleware } = require("../middleware/roleMiddleware");
-const { createGroup } = require("../controllers/groupsController");
+const { createGroup, getGroups } = require("../controllers/groupsController");
 
 groupsRouter.post("/create", authMiddleware, teacherMiddleware, createGroup);
+
+groupsRouter.get("/", authMiddleware, teacherMiddleware, getGroups);
 
 module.exports = groupsRouter;
