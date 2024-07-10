@@ -7,8 +7,11 @@ const mammoth = require("mammoth");
 const { getTextPrompt } = require("../utils/aiPrompt");
 const { Question } = require("../models/question");
 const { Exam } = require("../models/exam");
+const { Result } = require("../models/result");
+
 const { Sequelize } = require("sequelize");
 const db = require("../../config/db");
+const { GroupStudents } = require("../models/groupStudent");
 async function createExam(req, res) {
   if (!req.files.file) {
     return res.status(400).json({ error: "No file received." });
@@ -242,6 +245,35 @@ async function updateExam(req, res) {
   }
 }
 
+async function assignExam(req, res) {
+  try {
+    console.log(req.body);
+    const { group_id, exam_id } = req.body;
+    let { user_ids } = req.body;
+    if (typeof req.body.group_ids === "string") {
+      user_ids = JSON.parse(req.body.user_ids);
+    }
+    if (!group_id || !user_ids || !exam_id) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    await Promise.all(
+      user_ids.map(async (user_id) => {
+        const [result, created] = await Result.findOrCreate({
+          where: { user_id, exam_id, group_id },
+          defaults: { user_id, exam_id, group_id },
+        });
+        return { result, created };
+      })
+    );
+
+    res.status(200).json({ message: "Exam successfully assigned to students" });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ error: "Error while assigning exam" });
+  }
+}
+
 module.exports = {
   createExam,
   createExamWithText,
@@ -249,4 +281,5 @@ module.exports = {
   getExams,
   getExam,
   updateExam,
+  assignExam,
 };

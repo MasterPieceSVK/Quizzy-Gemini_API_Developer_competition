@@ -76,12 +76,17 @@ export default function Page({ params }: { params: { id: string } }) {
         {exam && (
           <div className=" gap-4 flex flex-col items-center">
             <h1 className="text-xl text-center">{exam.exam.title}</h1>
-            <button
-              className="btn btn-primary w-full lg:w-5/6"
-              onClick={handleAssign}
+            <Link
+              href={`/exam/assign/${exam.exam.id}`}
+              className="w-full md:w-5/6 2xl:w-3/5"
             >
-              Assign Quiz
-            </button>
+              <button
+                className="btn bg-green-500 text-xl text-white w-full "
+                onClick={handleAssign}
+              >
+                Assign Quiz
+              </button>
+            </Link>
             <div className="flex flex-col gap-3 items-center w-full">
               {exam.questions.map((question, i) => (
                 <QuestionCard {...question} key={i} />

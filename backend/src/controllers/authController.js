@@ -65,12 +65,16 @@ async function login(req, res) {
 }
 
 async function getCurrentUser(req, res) {
-  res.json({
-    username: req.user.username,
-    email: req.user.email,
-    id: req.user.id,
-    role: req.user.role,
-  });
+  if (req.user) {
+    res.json({
+      username: req.user.username,
+      email: req.user.email,
+      id: req.user.id,
+      role: req.user.role,
+    });
+  } else {
+    res.status(404).json({ error: "User not found." });
+  }
 }
 
 module.exports = { register, login, getCurrentUser };

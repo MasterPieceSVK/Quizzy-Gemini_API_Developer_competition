@@ -20,19 +20,23 @@ type Group = {
   teacher_id: number;
   studentCount: number;
   students: Student[];
+  assign: boolean;
+  exam_id: number;
 };
 
 type GroupResponse = {
   data: Group[];
 };
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string } }) {
   const [groupName, setGroupName] = useState("");
   const [requestError, setRequestError] = useState("");
   const [noGroups, setNoGroups] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const queryClient = useQueryClient();
   const router = useRouter();
+
+  const exam_id = Number(params.id);
 
   const { mutate: authMutate } = useMutation<Response, Error>({
     mutationFn: async () => {
@@ -86,7 +90,7 @@ export default function Page() {
   function handleCreateGroup() {
     if (groupName) {
       const modal = document.getElementById(
-        "my_modal_2"
+        "my_modal_4"
       ) as HTMLDialogElement | null;
       if (modal) {
         modal.close();
@@ -99,9 +103,12 @@ export default function Page() {
     queryKey: ["groups"],
     queryFn: () =>
       axios
-        .get(`${process.env.NEXT_PUBLIC_BASEURL}/groups`, {
-          withCredentials: true,
-        })
+        .get(
+          `${process.env.NEXT_PUBLIC_BASEURL}/groups/unassigned/${exam_id}`,
+          {
+            withCredentials: true,
+          }
+        )
         .then((res) => {
           setGroups(res.data);
         })
@@ -142,6 +149,8 @@ export default function Page() {
           )}
           {groups &&
             groups.map((group, i) => {
+              group.assign = true;
+              group.exam_id = exam_id;
               return <GroupCard key={i} {...group} />;
             })}
         </div>
@@ -149,7 +158,7 @@ export default function Page() {
           className="btn btn-primary mb-5"
           onClick={() => {
             const modal = document.getElementById(
-              "my_modal_2"
+              "my_modal_4"
             ) as HTMLDialogElement | null;
             if (modal) {
               modal.showModal();
@@ -158,7 +167,7 @@ export default function Page() {
         >
           Create new group
         </button>
-        <dialog id="my_modal_2" className="modal modal-bottom sm:modal-middle">
+        <dialog id="my_modal_4" className="modal modal-bottom sm:modal-middle">
           <div className="modal-box ">
             <h3 className="font-bold text-lg">Name of the group</h3>
             <div className="flex justify-center items-center mt-3">

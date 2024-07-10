@@ -3,7 +3,7 @@ import { Question } from "@/app/exams/finalize/page";
 export default function QuestionCard(props: Question) {
   return (
     <div
-      className="bg-base-300 p-4 flex flex-col items-center gap-3 w-full lg:w-5/6"
+      className="bg-base-300 p-4 flex flex-col items-center gap-3 w-full md:w-5/6 2xl:w-3/5"
       key={props.id}
     >
       <h3 className="text-base text-center text-wrap">{props.question}</h3>

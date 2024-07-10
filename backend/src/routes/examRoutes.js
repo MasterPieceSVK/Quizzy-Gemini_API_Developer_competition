@@ -10,6 +10,7 @@ const {
   validateExam,
   textExamCreationValidationRules,
   finalizeExamValidationRules,
+  assignExamValidationRules,
 } = require("../utils/validate");
 const { authMiddleware } = require("../middleware/authMiddleware");
 const { teacherMiddleware } = require("../middleware/roleMiddleware");
@@ -20,6 +21,7 @@ const {
   getExams,
   getExam,
   updateExam,
+  assignExam,
 } = require("../controllers/examsController");
 const { createExamInDb } = require("../services/createExamInDb");
 const upload = multer();
@@ -62,5 +64,7 @@ examRouter.get("/", authMiddleware, teacherMiddleware, getExams);
 examRouter.get("/:id", authMiddleware, teacherMiddleware, getExam);
 
 examRouter.put("/:id", authMiddleware, teacherMiddleware, updateExam);
+
+examRouter.post("/assign", authMiddleware, teacherMiddleware, assignExam);
 
 module.exports = examRouter;
