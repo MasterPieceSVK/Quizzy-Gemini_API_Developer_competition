@@ -24,6 +24,10 @@ const {
   assignExam,
 } = require("../controllers/examsController");
 const { createExamInDb } = require("../services/createExamInDb");
+const {
+  getAssignedExams,
+  getGroupsOffline,
+} = require("../controllers/groupsController");
 const upload = multer();
 
 examRouter.post(
@@ -61,6 +65,13 @@ examRouter.post(
 
 examRouter.get("/", authMiddleware, teacherMiddleware, getExams);
 
+examRouter.get(
+  "/assigned",
+  authMiddleware,
+  teacherMiddleware,
+  getGroupsOffline,
+  getAssignedExams
+);
 examRouter.get("/:id", authMiddleware, teacherMiddleware, getExam);
 
 examRouter.put("/:id", authMiddleware, teacherMiddleware, updateExam);

@@ -114,9 +114,7 @@ export default function Page({ params }: { params: { id: string } }) {
         })
         .catch((e: Error) => {
           console.log(e);
-          if (e.response?.data?.error === "No quizzes found for this user") {
-            setNoGroups(true);
-          } else if (e.response?.data) {
+          if (e.response?.data) {
             setRequestError(e.response.data.error);
           } else if (e.code === "ERR_NETWORK") {
             setRequestError("Network error. The server may be down.");
@@ -144,8 +142,10 @@ export default function Page({ params }: { params: { id: string } }) {
           </p>
         )}
         <div className="flex flex-col items-center w-full gap-3">
-          {groups.length === 0 && noGroups && (
-            <p>You don&apos;t have any groups</p>
+          {groups.length === 0 && !isPending && (
+            <p className="text-white text-center">
+              You don&apos;t have any groups to assign to
+            </p>
           )}
           {groups &&
             groups.map((group, i) => {

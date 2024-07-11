@@ -113,10 +113,13 @@ export default function Page() {
       )}
       <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-0 md:justify-around w-full items-center mt-5">
         <h3 className="text-3xl">Your Quizzes</h3>
-        <div className="flex gap-4">
-          <Link href={"/teacher-groups"}>
-            <button className="btn btn-primary">My groups</button>
-          </Link>
+        <div className="flex flex-col md:flex-row gap-4 md:gap-7 items-center">
+          <a href={"/teacher-groups"} className="link link-hover">
+            My groups
+          </a>
+          <a href={"/exams/assigned"} className="link link-hover ">
+            Assigned Quizzes
+          </a>
           <Link href={"/exams/create"}>
             <button className="btn btn-primary">Create New Quiz</button>
           </Link>
