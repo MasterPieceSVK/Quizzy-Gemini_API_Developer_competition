@@ -269,6 +269,77 @@ async function getAssignedExams(req, res) {
   }
 }
 
+async function joinGroup(req, res) {
+  try {
+    const { invite_code } = req.body;
+
+    const user_id = req.user.id;
+
+    const group = await Group.findOne({
+      where: { invite_code },
+    });
+    if (!group) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+    await GroupStudents.create({
+      user_id,
+      group_id: group.id,
+    });
+
+    res.json({ message: "Group joined successfully" });
+  } catch (e) {
+    if (e.name === "SequelizeUniqueConstraintError") {
+      res.status(400).json({ error: "You already joined this group" });
+    } else {
+      res.status(500).json({ error: "Error while joining group" });
+    }
+  }
+}
+
+async function getStudentGroups(req, res) {
+  try {
+    const user_id = req.user.id;
+
+    const groups = await GroupStudents.findAll({
+      where: user_id,
+      order: [["updatedAt", "DESC"]],
+    });
+
+    if (!groups) {
+      return res.status(204).json({ error: "You are't in any group" });
+    }
+
+    const groupsWithInfo = await Promise.all(
+      groups.map(async (group) => {
+        let infoAboutGroup = await Group.findByPk(group.group_id);
+        const { username } = await User.findByPk(infoAboutGroup.teacher_id);
+        return { ...infoAboutGroup.get(), teacherUsername: username };
+      })
+    );
+
+    res.json(groupsWithInfo);
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(500)
+      .json({ error: "Error while getting student groups" });
+  }
+}
+
+async function leaveGroup(req, res) {
+  try {
+    const user_id = req.user.id;
+    const { group_id } = req.body;
+
+    await GroupStudents.destroy({ where: { user_id, group_id } });
+
+    res.json({ message: "Group left successfully" });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ error: "Error while leaving group" });
+  }
+}
+
 module.exports = {
   createGroup,
   getGroups,
@@ -276,4 +347,7 @@ module.exports = {
   getGroupsOffline,
   deleteGroup,
   getAssignedExams,
+  joinGroup,
+  getStudentGroups,
+  leaveGroup,
 };

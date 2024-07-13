@@ -9,6 +9,7 @@ const GroupStudents = db.define("GroupStudents", {
       key: "id",
     },
     allowNull: false,
+    primaryKey: true,
   },
   group_id: {
     type: DataTypes.INTEGER,
@@ -17,6 +18,7 @@ const GroupStudents = db.define("GroupStudents", {
       key: "id",
     },
     allowNull: false,
+    primaryKey: true,
   },
 });
 

@@ -14,4 +14,17 @@ const teacherMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = { teacherMiddleware };
+const studentMiddleware = async (req, res, next) => {
+  try {
+    const { role } = req.user;
+    if (role === "student") {
+      next();
+    } else {
+      return res.json({ error: "You are not a student. Permission denied." });
+    }
+  } catch (e) {
+    return res.status(500).json({ error: "Error while checking role" });
+  }
+};
+
+module.exports = { teacherMiddleware, studentMiddleware };
