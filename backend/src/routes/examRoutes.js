@@ -13,7 +13,10 @@ const {
   assignExamValidationRules,
 } = require("../utils/validate");
 const { authMiddleware } = require("../middleware/authMiddleware");
-const { teacherMiddleware } = require("../middleware/roleMiddleware");
+const {
+  teacherMiddleware,
+  studentMiddleware,
+} = require("../middleware/roleMiddleware");
 const {
   createExam,
   createExamWithText,
@@ -22,6 +25,8 @@ const {
   getExam,
   updateExam,
   assignExam,
+  getStudentAssignedExams,
+  getCompletedStudentAssignedExams,
 } = require("../controllers/examsController");
 const { createExamInDb } = require("../services/createExamInDb");
 const {
@@ -72,6 +77,23 @@ examRouter.get(
   getGroupsOffline,
   getAssignedExams
 );
+
+examRouter.get(
+  "/student-assigned",
+  authMiddleware,
+  studentMiddleware,
+
+  getStudentAssignedExams
+);
+
+examRouter.get(
+  "/student-completed",
+  authMiddleware,
+  studentMiddleware,
+
+  getCompletedStudentAssignedExams
+);
+
 examRouter.get("/:id", authMiddleware, teacherMiddleware, getExam);
 
 examRouter.put("/:id", authMiddleware, teacherMiddleware, updateExam);

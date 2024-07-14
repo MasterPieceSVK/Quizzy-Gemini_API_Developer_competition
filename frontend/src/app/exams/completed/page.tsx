@@ -1,5 +1,6 @@
 "use client";
 
+import { Quiz, QuizResponse } from "@/app/student-dashboard/page";
 import { Error, Response } from "@/components/RegisterForm";
 import StudentQuizCard from "@/components/StudentQuizCard";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -7,22 +8,6 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-export type Quiz = {
-  id: number;
-  title: string;
-  exam_id: number;
-  group_id: number;
-  score: number;
-  finished: boolean;
-  groupName: string;
-  teacherUsername: string;
-};
-
-export type QuizResponse = {
-  data: Quiz[];
-  status: number;
-};
 
 export default function Page() {
   const [requestError, setRequestError] = useState("");
@@ -58,7 +43,7 @@ export default function Page() {
     queryKey: ["student-quizzes"],
     queryFn: () =>
       axios
-        .get(`${process.env.NEXT_PUBLIC_BASEURL}/exams/student-assigned`, {
+        .get(`${process.env.NEXT_PUBLIC_BASEURL}/exams/student-completed`, {
           withCredentials: true,
         })
         .then((res: QuizResponse) => {
@@ -84,33 +69,13 @@ export default function Page() {
 
   return (
     <div className="bg-base-100">
-      <nav className="flex flex-col md:flex-row justify-between mt-2">
-        <Link href={"/"}>
-          <button className="btn btn-ghost ml-2">Quizzy</button>
+      <nav>
+        <Link href={"/student-dashboard"}>
+          <button className="btn btn-ghost mt-2 ml-2">Back</button>
         </Link>
-        <div className="flex flex-col md:flex-row gap-4 md:gap-7 items-center mr-2">
-          <h5 className="block md:hidden text-7xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-primary via-blue-500 to-primary p-2">
-            Quizzy
-          </h5>
-          <Link href={"/student-groups"}>
-            <button className="btn btn-ghost text-lg border-primary border-2">
-              My groups
-            </button>
-          </Link>
-          <Link href={"/exams/completed"}>
-            <button className="btn btn-ghost text-lg border-primary border-2">
-              Completed Quizzes
-            </button>
-          </Link>
-        </div>
       </nav>
-      <main className="flex flex-col items-center gap-8 ">
-        <div className="flex items-center bg-base-200 rounded-xl p-2">
-          <h5 className="hidden md:block text-5xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-primary via-blue-500 to-primary p-2">
-            Quizzy
-          </h5>
-        </div>
-
+      <main className="flex flex-col items-center gap-4">
+        <h2 className="text-2xl">Your completed exams</h2>
         <div className="w-full">
           {requestError && (
             <p className="text-center text-wrap text-red-500">{requestError}</p>

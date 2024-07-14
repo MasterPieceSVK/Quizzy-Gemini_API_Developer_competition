@@ -12,6 +12,8 @@ const { Result } = require("../models/result");
 const { Sequelize } = require("sequelize");
 const db = require("../../config/db");
 const { GroupStudents } = require("../models/groupStudent");
+const { Group } = require("../models/group");
+const { User } = require("../models/user");
 async function createExam(req, res) {
   if (!req.files.file) {
     return res.status(400).json({ error: "No file received." });
@@ -274,6 +276,72 @@ async function assignExam(req, res) {
   }
 }
 
+async function getStudentAssignedExams(req, res) {
+  try {
+    const user_id = req.user.id;
+    const exams = await Result.findAll({ where: { user_id } });
+    if (!exams || exams.length === 0) {
+      return res.status(204).send();
+    }
+
+    const examsWithInfo = await Promise.all(
+      exams.map(async (exam) => {
+        const examData = await Exam.findByPk(exam.exam_id);
+
+        const group = await Group.findByPk(exam.group_id);
+
+        const teacherUsername = await User.findByPk(group.teacher_id);
+
+        return {
+          ...examData.get(),
+          ...exam.get(),
+          groupName: group.name,
+          teacherUsername: teacherUsername.username,
+        };
+      })
+    );
+
+    res.json(examsWithInfo);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Error while getting your assigned exams" });
+  }
+}
+
+async function getCompletedStudentAssignedExams(req, res) {
+  try {
+    const user_id = req.user.id;
+    const exams = await Result.findAll({ where: { user_id, finished: true } });
+    if (!exams || exams.length === 0) {
+      return res.status(204).send();
+    }
+
+    const examsWithInfo = await Promise.all(
+      exams.map(async (exam) => {
+        const examData = await Exam.findByPk(exam.exam_id);
+
+        const group = await Group.findByPk(exam.group_id);
+
+        const teacherUsername = await User.findByPk(group.teacher_id);
+
+        return {
+          ...examData.get(),
+          ...exam.get(),
+          groupName: group.name,
+          teacherUsername: teacherUsername.username,
+        };
+      })
+    );
+
+    res.json(examsWithInfo);
+  } catch (e) {
+    console.log(e);
+    return res
+      .status(500)
+      .json({ error: "Error while getting completed exams" });
+  }
+}
+
 module.exports = {
   createExam,
   createExamWithText,
@@ -282,4 +350,6 @@ module.exports = {
   getExam,
   updateExam,
   assignExam,
+  getCompletedStudentAssignedExams,
+  getStudentAssignedExams,
 };
