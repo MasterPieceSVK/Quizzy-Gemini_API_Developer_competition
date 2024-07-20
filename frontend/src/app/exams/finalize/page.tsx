@@ -27,7 +27,7 @@ type Input = {
   data: string;
 };
 
-export default function Page() {
+function PageContent() {
   const [exam, setExam] = useState<Question[]>([]);
   const [name, setName] = useState("");
   const [undefinedError, setUndefinedError] = useState(false);
@@ -238,6 +238,14 @@ export default function Page() {
           </div>
         )}
       </div>
+    </Suspense>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
     </Suspense>
   );
 }

@@ -19,7 +19,7 @@ export interface Exam {
   questionCount: number;
 }
 
-export default function Page() {
+function PageContent() {
   const [createdExam, setCreatedExam] = useState(false);
   const [editedExam, setEditedExam] = useState(false);
 
@@ -145,6 +145,14 @@ export default function Page() {
             })}
         </div>
       </main>
+    </Suspense>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
     </Suspense>
   );
 }
