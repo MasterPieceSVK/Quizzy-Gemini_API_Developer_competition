@@ -10,7 +10,7 @@ export default function StudentQuizCard(props: Quiz) {
         <h5 className="text-lg">{props.teacherUsername}</h5>
       </div>
       {!props.finished ? (
-        <Link href={`/exam/take/${props.exam_id}`}>
+        <Link href={`/exam/take/${props.exam_id}/${props.group_id}`}>
           <button className="btn btn-ghost border-primary border-2">
             Take
           </button>

@@ -24,7 +24,7 @@ const Result = db.define("Result", {
     references: { model: "Groups", key: "id" },
   },
   score: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.FLOAT,
     defaultValue: 0,
     allowNull: false,
     validate: {

@@ -342,6 +342,75 @@ async function getCompletedStudentAssignedExams(req, res) {
   }
 }
 
+async function getQuizQuestionsAndOptions(req, res) {
+  try {
+    const user_id = req.user.id;
+    const { exam_id, group_id } = req.params;
+    const isEligible = await Result.findOne({
+      where: { exam_id, user_id, group_id, finished: false },
+    });
+
+    if (!isEligible) {
+      return res.status(403).json({
+        error: "You are not eligible to take this quiz or it doesn't exist",
+      });
+    }
+    const examName = await Exam.findByPk(exam_id);
+    let questions = await Question.findAll({ where: { exam_id } });
+
+    questions = questions.map((question) => {
+      const questionObj = question.get({ plain: true });
+      delete questionObj.correct_option;
+      return questionObj;
+    });
+
+    res.json({ examName: examName.title, questions, group_id });
+  } catch (e) {
+    console.error(e);
+    res
+      .status(500)
+      .json({ error: "Error while getting quiz questions and options" });
+  }
+}
+
+async function submitExam(req, res) {
+  try {
+    const { exam_id, answers, group_id } = req.body;
+    const user_id = req.user.id;
+
+    const exam = await Question.findAll({ where: { exam_id } });
+    console.log(answers);
+    const resultArray = answers.map((answer) => {
+      const { id: answerId, answer: userAnswer } = answer;
+      console.log(answerId, answer);
+      const question = exam.find((q) => q.id === answerId);
+      if (!question) {
+        throw new Error("Invalid question id");
+      }
+      if (question.correct_option === userAnswer) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    const sum = resultArray.reduce((sum, answer) => sum + answer);
+    const percentage = Number(((sum / resultArray.length) * 100).toFixed(2));
+
+    const result = await Result.findOne({
+      where: { exam_id, user_id, group_id },
+    });
+    if (!result) {
+      throw new Error("Result not found");
+    }
+    await result.update({ finished: true, score: percentage });
+
+    res.json(percentage);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Error while submitting exam" });
+  }
+}
+
 module.exports = {
   createExam,
   createExamWithText,
@@ -352,4 +421,6 @@ module.exports = {
   assignExam,
   getCompletedStudentAssignedExams,
   getStudentAssignedExams,
+  getQuizQuestionsAndOptions,
+  submitExam,
 };

@@ -27,6 +27,8 @@ const {
   assignExam,
   getStudentAssignedExams,
   getCompletedStudentAssignedExams,
+  getQuizQuestionsAndOptions,
+  submitExam,
 } = require("../controllers/examsController");
 const { createExamInDb } = require("../services/createExamInDb");
 const {
@@ -99,5 +101,14 @@ examRouter.get("/:id", authMiddleware, teacherMiddleware, getExam);
 examRouter.put("/:id", authMiddleware, teacherMiddleware, updateExam);
 
 examRouter.post("/assign", authMiddleware, teacherMiddleware, assignExam);
+
+examRouter.get(
+  "/take/:exam_id/:group_id",
+  authMiddleware,
+  studentMiddleware,
+  getQuizQuestionsAndOptions
+);
+
+examRouter.post("/submit", authMiddleware, studentMiddleware, submitExam);
 
 module.exports = examRouter;
