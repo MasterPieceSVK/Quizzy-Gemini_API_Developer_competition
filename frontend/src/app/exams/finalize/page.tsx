@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export type Question = {
   correct?: string;
@@ -161,81 +161,83 @@ export default function Page() {
   }
 
   return (
-    <div className=" h-lvh">
-      <div className="h-[5%] bg-base-100">
-        <Link href={"/teacher-dashboard"}>
-          <button className="btn btn-ghost mt-2 ml-2">Quizzy</button>
-        </Link>
-      </div>
-      {!undefinedError ? (
-        <main className="bg-base-100 flex flex-col  items-center justify-center w-full min-h-[95%] gap-5">
-          <input
-            type="text"
-            placeholder="Type here"
-            className="input input-ghost w-full max-w-xs text-center text-xl"
-            defaultValue={name}
-            onChange={handleExamNameChange}
-          />
-
-          {exam &&
-            exam.map((question, index) => {
-              const theOption = question.options.find(
-                (option) => option === question.correct
-              );
-              console.log(theOption);
-              if (!theOption) {
-                question.correct = question.options[0];
-              }
-              return (
-                <CreateQuestionCard
-                  key={index}
-                  question={question}
-                  index={index}
-                  onQuestionChange={handleQuestionChange}
-                  onOptionChange={handleOptionChange}
-                  onCorrectChange={handleCorrectChange}
-                  onQuestionDelete={onQuestionDelete}
-                />
-              );
-            })}
-          <button
-            className="btn w-5/6 xl:w-1/2 btn-primary disabled:border-red-500 disabled:border-2"
-            onClick={addQuestion}
-            disabled={exam.length >= 20}
-          >
-            {exam.length < 20 ? (
-              <PlusIcon size={15} />
-            ) : (
-              <h5 className="text-white">Max. number of questions reached</h5>
-            )}
-          </button>
-
-          <button
-            className={`btn btn-primary ${
-              !requestError && "mb-7"
-            } disabled:border-primary disabled:text-primary`}
-            onClick={onCreateExam}
-            disabled={finalizeMutation.isPending}
-          >
-            {finalizeMutation.isPending ? "Creating..." : "Create"}
-          </button>
-          {requestError && (
-            <h6 className="text-red-500 text-center text-wrap w-5/6 mb-7">
-              {requestError}
-            </h6>
-          )}
-        </main>
-      ) : (
-        <div className="flex flex-col items-center justify-center gap-5 bg-base-100 h-full">
-          <h4 className="text-center text-wrap px-3">
-            An error occured when creating your quiz. Maybe the document
-            wasn&apos;t read correctly. Please try again.
-          </h4>
-          <Link href={"/exams/create"}>
-            <button className="btn btn-primary ">Back</button>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className=" h-lvh">
+        <div className="h-[5%] bg-base-100">
+          <Link href={"/teacher-dashboard"}>
+            <button className="btn btn-ghost mt-2 ml-2">Quizzy</button>
           </Link>
         </div>
-      )}
-    </div>
+        {!undefinedError ? (
+          <main className="bg-base-100 flex flex-col  items-center justify-center w-full min-h-[95%] gap-5">
+            <input
+              type="text"
+              placeholder="Type here"
+              className="input input-ghost w-full max-w-xs text-center text-xl"
+              defaultValue={name}
+              onChange={handleExamNameChange}
+            />
+
+            {exam &&
+              exam.map((question, index) => {
+                const theOption = question.options.find(
+                  (option) => option === question.correct
+                );
+                console.log(theOption);
+                if (!theOption) {
+                  question.correct = question.options[0];
+                }
+                return (
+                  <CreateQuestionCard
+                    key={index}
+                    question={question}
+                    index={index}
+                    onQuestionChange={handleQuestionChange}
+                    onOptionChange={handleOptionChange}
+                    onCorrectChange={handleCorrectChange}
+                    onQuestionDelete={onQuestionDelete}
+                  />
+                );
+              })}
+            <button
+              className="btn w-5/6 xl:w-1/2 btn-primary disabled:border-red-500 disabled:border-2"
+              onClick={addQuestion}
+              disabled={exam.length >= 20}
+            >
+              {exam.length < 20 ? (
+                <PlusIcon size={15} />
+              ) : (
+                <h5 className="text-white">Max. number of questions reached</h5>
+              )}
+            </button>
+
+            <button
+              className={`btn btn-primary ${
+                !requestError && "mb-7"
+              } disabled:border-primary disabled:text-primary`}
+              onClick={onCreateExam}
+              disabled={finalizeMutation.isPending}
+            >
+              {finalizeMutation.isPending ? "Creating..." : "Create"}
+            </button>
+            {requestError && (
+              <h6 className="text-red-500 text-center text-wrap w-5/6 mb-7">
+                {requestError}
+              </h6>
+            )}
+          </main>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-5 bg-base-100 h-full">
+            <h4 className="text-center text-wrap px-3">
+              An error occured when creating your quiz. Maybe the document
+              wasn&apos;t read correctly. Please try again.
+            </h4>
+            <Link href={"/exams/create"}>
+              <button className="btn btn-primary ">Back</button>
+            </Link>
+          </div>
+        )}
+      </div>
+    </Suspense>
   );
 }
