@@ -85,9 +85,14 @@ export default function Page() {
   return (
     <div className="bg-base-100">
       <nav className="flex flex-col md:flex-row justify-between mt-2">
-        <Link href={"/"}>
-          <button className="btn btn-ghost ml-2">Quizzy</button>
-        </Link>
+        <div className="flex justify-between">
+          <Link href={"/"}>
+            <button className="btn btn-ghost ml-2">Quizzy</button>
+          </Link>
+          <Link href={"/logout"}>
+            <button className="btn btn-ghost mr-2 md:hidden">Logout</button>
+          </Link>
+        </div>
         <div className="flex flex-col md:flex-row gap-4 md:gap-7 items-center mr-2">
           <h5 className="block md:hidden text-7xl font-bold bg-gradient-to-r bg-clip-text text-transparent from-primary via-blue-500 to-primary p-2">
             Quizzy
@@ -101,6 +106,9 @@ export default function Page() {
             <button className="btn btn-ghost text-lg border-primary border-2">
               Completed Quizzes
             </button>
+          </Link>
+          <Link href={"/logout"} className="hidden md:block">
+            <button className="btn btn-ghost mr-2 ">Logout</button>
           </Link>
         </div>
       </nav>

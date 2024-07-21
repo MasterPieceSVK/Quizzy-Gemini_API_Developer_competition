@@ -124,6 +124,9 @@ function PageContent() {
             <Link href={"/exams/create"}>
               <button className="btn btn-primary">Create New Quiz</button>
             </Link>
+            <Link href={"/logout"}>
+              <button className="btn btn-ghost mr-2 ">Logout</button>
+            </Link>
           </div>
         </div>
         {isPending && <h4 className="text-white mt-5">Fetching Quizzes...</h4>}
