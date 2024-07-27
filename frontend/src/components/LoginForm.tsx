@@ -59,6 +59,7 @@ export default function LoginForm() {
         ? data.usernameOrEmail
         : undefined,
     };
+    setFormError(null);
     loginMutate(result);
   };
 

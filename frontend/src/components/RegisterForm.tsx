@@ -82,6 +82,7 @@ export default function RegisterForm() {
   );
 
   const onSubmit = (data: SignupSchema) => {
+    setFormError(null);
     registerMutate(data);
   };
 
