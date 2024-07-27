@@ -3,6 +3,7 @@
 import { Error, Response } from "@/components/RegisterForm";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -60,6 +61,12 @@ export default function Page() {
           <p className="py-6">
             Upload your teaching materials and let Quizzy generate comprehensive
             multiple-choice quizzes in minutes.
+          </p>
+          <p className="text-[15px] text-right md:-translate-x-10 -translate-y-4 ">
+            Powered by{" "}
+            <span className=" bg-gradient-to-r bg-clip-text text-transparent from-[#4597e4] via-[#9078c8] to-[#d15d74]">
+              Gemini
+            </span>
           </p>
           {clickable ? (
             <Link
