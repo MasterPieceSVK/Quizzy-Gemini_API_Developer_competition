@@ -1,5 +1,6 @@
 # 🎓 Quizzy: AI-Enhanced Quiz Creation and Participation Platform
-## Overview
+
+## Overview 
 
 Quizzy is a full-stack web application built with Next.js for the frontend and Express.js (Node.js) for the backend. The platform empowers teachers to create quizzes using AI and provides students with a user-friendly environment to take these quizzes.
 
@@ -87,5 +88,27 @@ The application should now be running at http://localhost:3000.
   * Sign up or log in.
   * Join a group using an invite code and take the assigned quizzes.
   * Submit the quiz and receive immediate feedback on your performance.
+
+# Gifs
+## Teacher POV
+### Create a quiz
+![](https://github.com/MasterPieceSVK/Quizzy-Gemini_API_Developer_competition/blob/main/gifs/01_create_quiz.gif)
+
+### Create a group
+![](https://github.com/MasterPieceSVK/Quizzy-Gemini_API_Developer_competition/blob/main/gifs/02_create_group.gif)
+
+### Assign a quiz
+![](https://github.com/MasterPieceSVK/Quizzy-Gemini_API_Developer_competition/blob/main/gifs/03_assing_quiz.gif)
+
+### See quiz results
+![](https://github.com/MasterPieceSVK/Quizzy-Gemini_API_Developer_competition/blob/main/gifs/06_see_results.gif)
+
+## Student POV
+### Join a group
+![](https://github.com/MasterPieceSVK/Quizzy-Gemini_API_Developer_competition/blob/main/gifs/04_join_group.gif)
+
+### Take a quiz
+![](https://github.com/MasterPieceSVK/Quizzy-Gemini_API_Developer_competition/blob/main/gifs/05_take_quiz_2.gif)
+
 
 Enjoy using Quizzy! 🚀
