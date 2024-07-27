@@ -98,7 +98,7 @@ async function deleteGroup(req, res) {
         .status(403)
         .json({ error: "You are not authorized to delete this group" });
     }
-
+    await Result.destroy({ where: { group_id: id } });
     await group.destroy();
     res.json({ message: "Group deleted successfully" });
   } catch (e) {
