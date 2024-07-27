@@ -25,7 +25,7 @@ This project was created for the ***2024 Gemini API Developer Competition***.
   * PostgreSQL
   * Google Gemini AI
 
-## Getting Started
+## 🚀 Getting Started
 ### Prerequisites
 
 * Node.js (v21.7.3 recommended)
